@@ -1,6 +1,7 @@
 from serverData import ServerData
 from local_storage import LocalStorage
 import pandas as pd
+import json
 
 local_storage = LocalStorage()
 file_data = ''
@@ -32,11 +33,77 @@ app_filt = (job_date_group_df['Union Code'].isin(['1ST-NEW', '2ND-NEW',
                                                   '7TH-NEW', '8TH', '8TH-NEW']))
 job_date_group_df.loc[app_filt, 'Union Code'] = 'APPRENTICE'
 
-job_date_group_gp = job_date_group_df.groupby(['Job Name', 'Log Date'])\
-    .apply(lambda x: x[['Union Code']].to_dict('records'))\
-    .reset_index().to_json('data.json', orient='records')
+job_date_group_gp = job_date_group_df.groupby(['Job Name', 'Log Date'])
 
+# Get num of journeymen for each group
+journey_to_apps = job_date_group_gp['Union Code']\
+    .value_counts()\
+    .rename_axis(['Job Name', 'Log Date', 'Union Code'])\
+    .reset_index(name='Counts')
 
-# # Get num of journeymen for each group
-# journey_to_apps = job_date_group_gp['Union Code'].value_counts()
-# journey_to_apps.to_excel('data.xlsx')
+journey_to_apps.groupby(['Job Name', 'Log Date'], group_keys=True)\
+    .apply(lambda x: x[['Union Code', 'Counts']].to_dict('records'))\
+    .reset_index().rename(columns={0: 'Counts'})\
+    .to_json('data.json', orient='records')
+
+with open('data.json') as file:
+    data_dict = json.load(file)
+
+for record in data_dict:
+    if len(record['Counts']) == 1:
+        continue
+
+    apprentice_count = 0
+    journey_count = 0
+    for count in record['Counts']:
+
+        if count['Union Code'] == 'APPRENTICE':
+            apprentice_count = count['Counts']
+
+        if count['Union Code'] == 'JOURNEY':
+            journey_count = count['Counts']
+
+    # Calculate Ratio
+    if apprentice_count != 0 or journey_count != 0:
+        day_ratio = apprentice_count / journey_count
+        record['day_ratio'] = round(day_ratio, 2)
+
+with open('data.json', 'w') as outfile:
+    outfile.write(json.dumps(data_dict, indent=2))
+
+# Load in json data
+with open('data.json', 'r') as data_file:
+    data = json.load(data_file)
+
+# Format json data
+formatted_json = []
+
+data_len = len(data)
+job_index = 0
+# Loop through data
+while job_index < data_len:
+    # Initialize job name and days list
+    current_job = data[job_index]['Job Name']
+    current_obj = {}
+    current_obj['Job Name'] = current_job
+    current_obj['days'] = []
+
+    while current_job == data[job_index]['Job Name']:
+        # Initialize new job object
+        days_obj = {}
+        days_obj['Log Date'] = data[job_index]['Log Date']
+        if 'day_ratio' in data[job_index].keys():
+            days_obj['day_ratio'] = data[job_index]['day_ratio']
+
+        for count in data[job_index]['Counts']:
+            days_obj[count['Union Code']] = count['Counts']
+
+        current_obj['days'].append(days_obj)
+        job_index += 1
+        if job_index >= data_len:
+            break
+
+    formatted_json.append(current_obj)
+
+with open('data.json', 'w') as outfile:
+    outfile.write(json.dumps(formatted_json, indent=2))
