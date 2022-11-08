@@ -1,5 +1,5 @@
-def get_server_data():
-    sql_server_data = '''
+def get_server_data(prev_date):
+    sql_server_data = f'''
     SELECT
         labor.employee_code,
         e.name,
@@ -21,8 +21,10 @@ def get_server_data():
     ON
         labor.job_id = j.job_id
     WHERE
-        labor.log_date >= '01-NOV-22'
+        labor.log_date >= '{prev_date}'
     AND
         labor.union_code NOT IN ('FOREMEN', 'STOC-NEW', 'C4A')
+    AND
+        j.job_number in ('21071')
     '''
     return sql_server_data

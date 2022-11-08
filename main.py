@@ -2,6 +2,7 @@ from serverData import ServerData
 from local_storage import LocalStorage
 import pandas as pd
 import json
+from send_email import send_email
 
 local_storage = LocalStorage()
 file_data = ''
@@ -9,6 +10,7 @@ file_data = ''
 if not local_storage.server_data_exists():
     server_data = ServerData()
     server_data.get_data()
+    print('Pulled data from server')
     local_storage.save_server_data(server_data.data)
     local_storage.stamp_current_date()
     file_data = local_storage.get_file_data()
@@ -16,12 +18,15 @@ else:
     # Check if data was pulled today
     if local_storage.pulled_data_today():
         file_data = local_storage.get_file_data()
+        print('Pulled data from csv file')
     else:
         server_data = ServerData()
         server_data.get_data()
+        print('Pulled data from server')
         local_storage.save_server_data(server_data.data)
         local_storage.stamp_current_date()
         file_data = local_storage.get_file_data()
+
 
 # Find number of jouneyman to apprentice in jobs
 union_code_filt = file_data['Union Code'].isin(['C4A', 'FOREMEN'])
@@ -84,14 +89,11 @@ job_index = 0
 while job_index < data_len:
     # Initialize job name and days list
     current_job = data[job_index]['Job Name']
-    current_obj = {}
-    current_obj['Job Name'] = current_job
-    current_obj['days'] = []
+    current_obj = {'Job Name': current_job, 'days': []}
 
     while current_job == data[job_index]['Job Name']:
         # Initialize new job object
-        days_obj = {}
-        days_obj['Log Date'] = data[job_index]['Log Date']
+        days_obj = {'Log Date': data[job_index]['Log Date']}
         if 'day_ratio' in data[job_index].keys():
             days_obj['day_ratio'] = data[job_index]['day_ratio']
 
@@ -105,5 +107,14 @@ while job_index < data_len:
 
     formatted_json.append(current_obj)
 
+    # Add in job ratios
+    for job in formatted_json:
+        if job['Job Name'] == '6th & San Julian	':
+            job['set_app'] = 1
+            job['set_journey'] = 3
+            job['set_ratio'] = round(job['set_app'] / job['set_journey'], 2)
+
 with open('data.json', 'w') as outfile:
     outfile.write(json.dumps(formatted_json, indent=2))
+
+send_email()
