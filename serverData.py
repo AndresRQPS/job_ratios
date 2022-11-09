@@ -17,9 +17,6 @@ def days_till_tuesday():
 
 class ServerData:
 
-    # Get data that only goes back to the last Tuesday
-    # loop back by one day until it is Tuesday
-    # Return then number and pass it to num_days_back
     num_days_back = days_till_tuesday()
     prev_date = datetime.now() - timedelta(days=num_days_back)
     prev_date_str = prev_date.strftime('%d-%b-%y')

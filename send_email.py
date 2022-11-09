@@ -59,6 +59,7 @@ def send_email():
 
     sender = "andresr@qpscompany.com"
     receivers = office_emails
+    # receivers = ['andresr@qpscompany.com']
 
     message = MIMEMultipart("alternative")
     message["Subject"] = "Certified Job Ratios"
@@ -76,11 +77,11 @@ def send_email():
     message.attach(part1)
 
     try:
-        smtpObj = smtplib.SMTP("mail2.qpscompany.com", 587)
-        smtpObj.starttls()
-        smtpObj.login(my_email, my_password)
-        smtpObj.sendmail(sender, receivers, message.as_string())
-        smtpObj.close()
+        smtp_obj = smtplib.SMTP("mail2.qpscompany.com", 587)
+        smtp_obj.starttls()
+        smtp_obj.login(my_email, my_password)
+        smtp_obj.sendmail(sender, receivers, message.as_string())
+        smtp_obj.close()
 
         print("Successfully sent email")
     except Exception as e:

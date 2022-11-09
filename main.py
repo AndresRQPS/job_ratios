@@ -107,16 +107,43 @@ while job_index < data_len:
 
     formatted_json.append(current_obj)
 
-    # Add in job ratios
-    for job in formatted_json:
-        if job['Job Name'] == '6th & San Julian	':
-            job['set_app'] = 1
-            job['set_journey'] = 3
-            job['set_ratio'] = round(job['set_app'] / job['set_journey'], 2)
-
 with open('data.json', 'w') as outfile:
     outfile.write(json.dumps(formatted_json, indent=2))
 
+with open('data.json') as job_ratio_file:
+    job_data = json.load(job_ratio_file)
 
+job_ratios = [
+    {
+        'job_name': '6th & San Julian	',
+        'set_app': 1,
+        'set_journey': 3
+    },
+    {
+        'job_name': 'CSULB Liberal Arts 1 & Psychology',
+        'set_app': 1,
+        'set_journey': 3
+    },
+    {
+        'job_name': 'JCC Courthouse 6th Floor	',
+        'set_app': 1,
+        'set_journey': 3
+    },
+    {
+        'job_name': 'Long Beach Airport',
+        'set_app': 1,
+        'set_journey': 3
+    }
+]
 
-# send_email()
+for set_job in job_ratios:
+    for stored_job in job_data:
+        if set_job['job_name'] == stored_job['Job Name']:
+            stored_job['set_app'] = set_job['set_app']
+            stored_job['set_journey'] = set_job['set_journey']
+            stored_job['set_ratio'] = round(set_job['set_app'] / set_job['set_journey'], 2)
+
+with open('data.json', 'w') as job_file:
+    job_file.write(json.dumps(job_data, indent=2))
+
+send_email()
