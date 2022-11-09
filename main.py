@@ -117,4 +117,6 @@ while job_index < data_len:
 with open('data.json', 'w') as outfile:
     outfile.write(json.dumps(formatted_json, indent=2))
 
-send_email()
+
+
+# send_email()
