@@ -27,10 +27,12 @@ else:
         local_storage.stamp_current_date()
         file_data = local_storage.get_file_data()
 
-
 # Find number of jouneyman to apprentice in jobs
 union_code_filt = file_data['Union Code'].isin(['C4A', 'FOREMEN'])
 job_date_group_df: pd.DataFrame = file_data.loc[~union_code_filt]
+
+# Remove duplicates by employee_code, job_id, and Log Date
+job_date_group_df = job_date_group_df.drop_duplicates(subset=['employee_code', 'job_id', 'Log Date'])
 
 app_filt = (job_date_group_df['Union Code'].isin(['1ST-NEW', '2ND-NEW',
                                                   '3RD', '4TH-NEW',
