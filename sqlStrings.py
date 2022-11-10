@@ -23,7 +23,7 @@ def get_server_data(prev_date):
     WHERE
         labor.log_date >= '{prev_date}'
     AND
-        labor.union_code NOT IN ('FOREMEN', 'STOC-NEW', 'C4A')
+        labor.union_code NOT IN ('STOC-NEW', 'C4A')
     AND
         j.job_number in ('21071', '22055', '22002', '20039')
     '''

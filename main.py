@@ -28,7 +28,7 @@ else:
         file_data = local_storage.get_file_data()
 
 # Find number of jouneyman to apprentice in jobs
-union_code_filt = file_data['Union Code'].isin(['C4A', 'FOREMEN'])
+union_code_filt = file_data['Union Code'].isin(['C4A'])
 job_date_group_df: pd.DataFrame = file_data.loc[~union_code_filt]
 
 # Remove duplicates by employee_code, job_id, and Log Date
@@ -53,12 +53,25 @@ journey_to_apps.groupby(['Job Name', 'Log Date'], group_keys=True)\
     .reset_index().rename(columns={0: 'Counts'})\
     .to_json('data.json', orient='records')
 
+
+# check if apprentice to journeymen count is compliant on job
+def is_compliant(app_amount, journey_amount):
+    if app_amount == 0 and 1 <= journey_amount <= 3:
+        return True
+
+    min_journey_count = app_amount * 3
+
+    if min_journey_count <= journey_amount <= min_journey_count + 3:
+        return True
+
+    return False
+
+
+# Add if job is compliant (Yes, No)
 with open('data.json') as file:
     data_dict = json.load(file)
 
 for record in data_dict:
-    if len(record['Counts']) == 1:
-        continue
 
     apprentice_count = 0
     journey_count = 0
@@ -70,10 +83,11 @@ for record in data_dict:
         if count['Union Code'] == 'JOURNEY':
             journey_count = count['Counts']
 
-    # Calculate Ratio
-    if apprentice_count != 0 or journey_count != 0:
-        day_ratio = apprentice_count / journey_count
-        record['day_ratio'] = round(day_ratio, 2)
+    if apprentice_count == 0:
+        record['Counts'].append({"Union Code": "APPRENTICE", "Counts": 0})
+
+    # Check if apprentice to journeymen count is compliant
+    record['is_compliant'] = is_compliant(apprentice_count, journey_count)
 
 with open('data.json', 'w') as outfile:
     outfile.write(json.dumps(data_dict, indent=2))
@@ -82,12 +96,12 @@ with open('data.json', 'w') as outfile:
 with open('data.json', 'r') as data_file:
     data = json.load(data_file)
 
-# Format json data
-formatted_json = []
 
+formatted_json = []
 data_len = len(data)
 job_index = 0
-# Loop through data
+
+# Format json data
 while job_index < data_len:
     # Initialize job name and days list
     current_job = data[job_index]['Job Name']
@@ -96,11 +110,11 @@ while job_index < data_len:
     while current_job == data[job_index]['Job Name']:
         # Initialize new job object
         days_obj = {'Log Date': data[job_index]['Log Date']}
-        if 'day_ratio' in data[job_index].keys():
-            days_obj['day_ratio'] = data[job_index]['day_ratio']
 
         for count in data[job_index]['Counts']:
             days_obj[count['Union Code']] = count['Counts']
+
+        days_obj['is_compliant'] = data[job_index]['is_compliant']
 
         current_obj['days'].append(days_obj)
         job_index += 1
@@ -111,41 +125,5 @@ while job_index < data_len:
 
 with open('data.json', 'w') as outfile:
     outfile.write(json.dumps(formatted_json, indent=2))
-
-with open('data.json') as job_ratio_file:
-    job_data = json.load(job_ratio_file)
-
-job_ratios = [
-    {
-        'job_name': '6th & San Julian	',
-        'set_app': 1,
-        'set_journey': 3
-    },
-    {
-        'job_name': 'CSULB Liberal Arts 1 & Psychology',
-        'set_app': 1,
-        'set_journey': 3
-    },
-    {
-        'job_name': 'JCC Courthouse 6th Floor	',
-        'set_app': 1,
-        'set_journey': 3
-    },
-    {
-        'job_name': 'Long Beach Airport',
-        'set_app': 1,
-        'set_journey': 3
-    }
-]
-
-for set_job in job_ratios:
-    for stored_job in job_data:
-        if set_job['job_name'] == stored_job['Job Name']:
-            stored_job['set_app'] = set_job['set_app']
-            stored_job['set_journey'] = set_job['set_journey']
-            stored_job['set_ratio'] = round(set_job['set_app'] / set_job['set_journey'], 2)
-
-with open('data.json', 'w') as job_file:
-    job_file.write(json.dumps(job_data, indent=2))
 
 send_email()

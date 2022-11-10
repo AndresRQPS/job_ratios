@@ -5,21 +5,9 @@ from email.mime.text import MIMEText
 import json
 
 
-def highlight(set_ratio, day_ratio):
-    return 'style="color:red;"' if day_ratio > set_ratio else ''
+def highlight(is_compliant_bool):
+    return 'style="color:red;"' if not is_compliant_bool else ''
 
-
-# check if app to journeymen count is correct on job
-def check_count(app_count, journey_count):
-    if app_count == 0 and 1 <= journey_count <= 3:
-        return True
-
-    min_journey_count = app_count * 3
-
-    if min_journey_count <= journey_count <= min_journey_count + 3:
-        return True
-
-    return False
 
 def compile_html():
     # Get json data
@@ -37,25 +25,19 @@ def compile_html():
     for index, job in enumerate(data):
         # Job title
         html_string += f'<h2>{job["Job Name"]}</h2>\n'
-        html_string += f'<p>Set Ratio: {job["set_app"]} Apprentice to {job["set_journey"]} Journeymen ({job["set_ratio"]})</p>\n'
+        html_string += f'<p>Set Ratio: 1 Apprentice to 3 Journeymen</p>\n'
 
         for day in job['days']:
-            if 'APPRENTICE' not in day.keys():
-                day['APPRENTICE'] = 0
-
             if 'JOURNEY' not in day.keys():
                 print(f'There is no journeymen in {day["Job Name"]}')
                 exit()
-
-            if 'day_ratio' not in day.keys():
-                day['day_ratio'] = 0
 
             html_string += f'<h4>{day["Log Date"]}</h4>'
             html_string += f'''
             <ul>
                 <li>Apprentice - {day["APPRENTICE"]}</li>
                 <li>Journey - {day["JOURNEY"]}</li>
-                <li {highlight(set_ratio=job['set_ratio'], day_ratio=day['day_ratio'])}>Ratio - {day["day_ratio"]}</li>
+                <li {highlight(day['is_compliant'])}>Compliant - {'Yes' if day['is_compliant'] else 'No'}</li>
             </ul>
             '''
 
