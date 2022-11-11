@@ -59,12 +59,15 @@ journey_to_apps.groupby(['Job Name', 'Log Date'], group_keys=True)\
 
 # check if apprentice to journeymen count is compliant on job
 def is_compliant(app_amount, journey_amount):
-    if app_amount == 0 and 1 <= journey_amount <= 3:
+    set_app_count = 1
+    set_journey_count = 3
+
+    if app_amount == 0 and 1 <= journey_amount <= set_journey_count:
         return True
 
-    min_journey_count = app_amount * 3
+    min_journey_count = app_amount * set_journey_count
 
-    if min_journey_count <= journey_amount <= min_journey_count + 3:
+    if min_journey_count <= journey_amount <= min_journey_count + set_journey_count:
         return True
 
     return False
@@ -75,7 +78,6 @@ with open('data.json') as file:
     data_dict = json.load(file)
 
 for record in data_dict:
-
     apprentice_count = 0
     journey_count = 0
     for count in record['Counts']:
