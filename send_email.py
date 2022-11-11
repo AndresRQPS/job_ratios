@@ -63,8 +63,8 @@ def send_email():
     my_password = config["EMAILPASSWORD"]
 
     sender = "andresr@qpscompany.com"
-    # receivers = office_emails
-    receivers = ['andresr@qpscompany.com']
+    receivers = office_emails
+    # receivers = ['andresr@qpscompany.com']
 
     message = MIMEMultipart("alternative")
     message["Subject"] = "Certified Job Ratios"

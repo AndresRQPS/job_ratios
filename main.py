@@ -40,6 +40,9 @@ app_filt = (job_date_group_df['Union Code'].isin(['1ST-NEW', '2ND-NEW',
                                                   '7TH-NEW', '8TH', '8TH-NEW']))
 job_date_group_df.loc[app_filt, 'Union Code'] = 'APPRENTICE'
 
+journey_filt = job_date_group_df['Union Code'].isin(['FOREMEN'])
+job_date_group_df.loc[journey_filt, 'Union Code'] = 'JOURNEY'
+
 job_date_group_gp = job_date_group_df.groupby(['Job Name', 'Log Date'])
 
 # Get num of journeymen for each group
