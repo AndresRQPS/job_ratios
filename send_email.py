@@ -16,7 +16,6 @@ def compile_html():
         <head></head>
         <body>
           <p>Good morning Rachel and Nela,</p>
-          <p>Ratio = Apprentice / Journeymen</p>
     '''
     # Loop though jobs
     with open('data.json', 'r') as data_csv:

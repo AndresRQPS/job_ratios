@@ -3,6 +3,7 @@ from local_storage import LocalStorage
 import pandas as pd
 import json
 from send_email import send_email
+from job_ratios import job_ratios
 
 local_storage = LocalStorage()
 file_data = ''
@@ -58,9 +59,11 @@ journey_to_apps.groupby(['Job Name', 'Log Date'], group_keys=True)\
 
 
 # check if apprentice to journeymen count is compliant on job
-def is_compliant(app_amount, journey_amount):
+def is_compliant(app_amount, journey_amount, app_ratio, journey_ratio):
     set_app_count = 1
-    set_journey_count = 3
+    set_journey_count = journey_ratio
+
+    print(app_ratio, journey_ratio)
 
     if app_amount == 0 and 1 <= journey_amount <= set_journey_count:
         return True
@@ -91,8 +94,12 @@ for record in data_dict:
     if apprentice_count == 0:
         record['Counts'].append({"Union Code": "APPRENTICE", "Counts": 0})
 
+    # Get set apprentice and set journeymen ratio from local dict in job_ratios.py
+    set_app_ratio = job_ratios[record['Job Name']]['num_apprentice']
+    set_journey_ratio = job_ratios[record['Job Name']]['num_journeymen']
+
     # Check if apprentice to journeymen count is compliant
-    record['is_compliant'] = is_compliant(apprentice_count, journey_count)
+    record['is_compliant'] = is_compliant(apprentice_count, journey_count, set_app_ratio, set_journey_ratio)
 
 with open('data.json', 'w') as outfile:
     outfile.write(json.dumps(data_dict, indent=2))
@@ -100,7 +107,6 @@ with open('data.json', 'w') as outfile:
 # Load in json data
 with open('data.json', 'r') as data_file:
     data = json.load(data_file)
-
 
 formatted_json = []
 data_len = len(data)
