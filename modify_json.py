@@ -103,4 +103,3 @@ def add_compliant():
 
     with open('data.json', 'w') as data_file:
         data_file.write(json.dumps(job_data, indent=2))
-

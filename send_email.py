@@ -24,7 +24,7 @@ def compile_html():
     for index, job in enumerate(data):
         # Job title
         html_string += f'<h2>{job["Job Name"]}</h2>\n'
-        html_string += f'<p>Set Ratio: 1 Apprentice to 3 Journeymen</p>\n'
+        html_string += f'<p>Set Ratio: {job["set_apprentice_count"]} Apprentice to {job["set_journey_count"]} Journeymen</p>\n'
 
         for day in job['days']:
             if 'JOURNEY' not in day.keys():
@@ -36,6 +36,7 @@ def compile_html():
             <ul>
                 <li>Apprentice - {day["APPRENTICE"]}</li>
                 <li>Journey - {day["JOURNEY"]}</li>
+                <li {highlight(day['is_compliant'])} >Compliant - {'Yes' if day['is_compliant'] else 'No'}
             </ul>
             '''
 
@@ -61,8 +62,8 @@ def send_email():
     my_password = config["EMAILPASSWORD"]
 
     sender = "andresr@qpscompany.com"
-    # receivers = office_emails
-    receivers = ['andresr@qpscompany.com']
+    receivers = office_emails
+    # receivers = ['andresr@qpscompany.com']
 
     message = MIMEMultipart("alternative")
     message["Subject"] = "Certified Job Ratios"
@@ -75,8 +76,6 @@ def send_email():
     part1 = MIMEText(html, "html")
 
     # Attach parts into message container.
-    # According to RFC 2046, the last part of a multipart message, in this case
-    # the HTML message, is best and preferred.
     message.attach(part1)
 
     try:
