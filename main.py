@@ -1,9 +1,8 @@
 from serverData import ServerData
 from local_storage import LocalStorage
 import pandas as pd
-import json
 from send_email import send_email
-from job_ratios import job_ratios
+from modify_json import format_json, add_apprentice_count, add_set_app_journey_counts, add_compliant
 
 local_storage = LocalStorage()
 file_data = ''
@@ -57,84 +56,12 @@ journey_to_apps.groupby(['Job Name', 'Log Date'], group_keys=True)\
     .reset_index().rename(columns={0: 'Counts'})\
     .to_json('data.json', orient='records')
 
+format_json()
 
-# check if apprentice to journeymen count is compliant on job
-def is_compliant(app_amount, journey_amount, app_ratio, journey_ratio):
-    set_app_count = 1
-    set_journey_count = journey_ratio
+add_apprentice_count()
 
-    print(app_ratio, journey_ratio)
+add_set_app_journey_counts()
 
-    if app_amount == 0 and 1 <= journey_amount <= set_journey_count:
-        return True
-
-    min_journey_count = app_amount * set_journey_count
-
-    if min_journey_count <= journey_amount <= min_journey_count + set_journey_count:
-        return True
-
-    return False
-
-
-# Add if job is compliant (Yes, No)
-with open('data.json') as file:
-    data_dict = json.load(file)
-
-for record in data_dict:
-    apprentice_count = 0
-    journey_count = 0
-    for count in record['Counts']:
-
-        if count['Union Code'] == 'APPRENTICE':
-            apprentice_count = count['Counts']
-
-        if count['Union Code'] == 'JOURNEY':
-            journey_count = count['Counts']
-
-    if apprentice_count == 0:
-        record['Counts'].append({"Union Code": "APPRENTICE", "Counts": 0})
-
-    # Get set apprentice and set journeymen ratio from local dict in job_ratios.py
-    set_app_ratio = job_ratios[record['Job Name']]['num_apprentice']
-    set_journey_ratio = job_ratios[record['Job Name']]['num_journeymen']
-
-    # Check if apprentice to journeymen count is compliant
-    record['is_compliant'] = is_compliant(apprentice_count, journey_count, set_app_ratio, set_journey_ratio)
-
-with open('data.json', 'w') as outfile:
-    outfile.write(json.dumps(data_dict, indent=2))
-
-# Load in json data
-with open('data.json', 'r') as data_file:
-    data = json.load(data_file)
-
-formatted_json = []
-data_len = len(data)
-job_index = 0
-
-# Format json data
-while job_index < data_len:
-    # Initialize job name and days list
-    current_job = data[job_index]['Job Name']
-    current_obj = {'Job Name': current_job, 'days': []}
-
-    while current_job == data[job_index]['Job Name']:
-        # Initialize new job object
-        days_obj = {'Log Date': data[job_index]['Log Date']}
-
-        for count in data[job_index]['Counts']:
-            days_obj[count['Union Code']] = count['Counts']
-
-        days_obj['is_compliant'] = data[job_index]['is_compliant']
-
-        current_obj['days'].append(days_obj)
-        job_index += 1
-        if job_index >= data_len:
-            break
-
-    formatted_json.append(current_obj)
-
-with open('data.json', 'w') as outfile:
-    outfile.write(json.dumps(formatted_json, indent=2))
+add_compliant()
 
 send_email()

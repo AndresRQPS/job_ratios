@@ -36,7 +36,6 @@ def compile_html():
             <ul>
                 <li>Apprentice - {day["APPRENTICE"]}</li>
                 <li>Journey - {day["JOURNEY"]}</li>
-                <li {highlight(day['is_compliant'])}>Compliant - {'Yes' if day['is_compliant'] else 'No'}</li>
             </ul>
             '''
 
