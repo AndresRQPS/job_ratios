@@ -19,4 +19,9 @@ job_ratios = {
             "num_apprentice": 1,
             "num_journeymen": 3
         },
+    "Vaughn":
+        {
+            "num_apprentice": 1,
+            "num_journeymen": 5
+        }
 }

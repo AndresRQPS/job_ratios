@@ -25,6 +25,6 @@ def get_server_data(prev_date):
     AND
         labor.union_code NOT IN ('STOC-NEW', 'C4A')
     AND
-        j.job_number in ('21071', '22055', '22002', '20039')
+        j.job_number in ('21071', '22055', '22002', '20039', '22029', '21095', '22063', '21094')
     '''
     return sql_server_data
