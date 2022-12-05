@@ -23,5 +23,20 @@ job_ratios = {
         {
             "num_apprentice": 1,
             "num_journeymen": 5
+        },
+    "UCR Batchelor Hall":
+        {
+            "num_apprentice": 1,
+            "num_journeymen": 5
+        },
+    "ECHS Gardena":
+        {
+            "num_apprentice": 1,
+            "num_journeymen": 5
+        },
+    "CHS 105A Biomedical Cyclotron (UCLA)":
+        {
+            "num_apprentice": 1,
+            "num_journeymen": 5
         }
 }

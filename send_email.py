@@ -24,7 +24,7 @@ def compile_html():
     for index, job in enumerate(data):
         # Job title
         html_string += f'<h2>{job["Job Name"]}</h2>\n'
-        html_string += f'<p>Set Ratio: {job["set_apprentice_count"]} Apprentice to {job["set_journey_count"]} Journeymen</p>\n'
+        html_string += f'<p>Set Ratio: <b>{job["set_apprentice_count"]}</b> Apprentice to <b>{job["set_journey_count"]}</b> Journeymen</p>\n'
 
         for day in job['days']:
             if 'JOURNEY' not in day.keys():
@@ -56,14 +56,14 @@ def compile_html():
 def send_email():
     config = dotenv.dotenv_values(".env")
 
-    office_emails = ['rachelg@qpscompany.com', 'nelan@qpscompany.com', 'andresr@qpscompany.com']
+    office_emails = ['rachelg@qpscompany.com', 'nelan@qpscompany.com', 'cynthiad@qpscompany.com', 'andresr@qpscompany.com']
 
     my_email = config["EMAILUSERNAME"]
     my_password = config["EMAILPASSWORD"]
 
     sender = "andresr@qpscompany.com"
-    # receivers = office_emails
-    receivers = ['andresr@qpscompany.com']
+    receivers = office_emails
+    # receivers = ['andresr@qpscompany.com']
 
     message = MIMEMultipart("alternative")
     message["Subject"] = "Certified Job Ratios"
