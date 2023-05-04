@@ -1,3 +1,5 @@
+import datetime
+
 import dotenv
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -56,14 +58,20 @@ def compile_html():
 def send_email():
     config = dotenv.dotenv_values(".env")
 
-    office_emails = ['rachelg@qpscompany.com', 'nelan@qpscompany.com', 'cynthiad@qpscompany.com', 'andresr@qpscompany.com']
+    office_emails = ['rachelg@qpscompany.com',
+                     'nelan@qpscompany.com',
+                     'cynthiad@qpscompany.com',
+                     'andresr@qpscompany.com',
+                     'mescobar@qpscompany.com',
+                     'shanam@qpscompany.com']
+
+    # office_emails = ['andresr@qpscompany.com']
 
     my_email = config["EMAILUSERNAME"]
     my_password = config["EMAILPASSWORD"]
 
     sender = "andresr@qpscompany.com"
     receivers = office_emails
-    # receivers = ['andresr@qpscompany.com']
 
     message = MIMEMultipart("alternative")
     message["Subject"] = "Certified Job Ratios"
@@ -85,6 +93,6 @@ def send_email():
         smtp_obj.sendmail(sender, receivers, message.as_string())
         smtp_obj.close()
 
-        print("Successfully sent email")
+        print(f"Successfully sent email on {datetime.datetime.now().strftime('%d-%b-%y')}")
     except Exception as e:
         print(e)

@@ -21,6 +21,11 @@ class LocalStorage:
             return False
 
     def get_file_date(self):
+        # Check if date_file.txt exists
+        date_file_exists = os.path.isfile(self.DATE_FILE)
+        if not date_file_exists:
+            with open(self.DATE_FILE, 'w') as file:
+                file.write('')
         with open(self.DATE_FILE, 'r') as date_file:
             return date_file.read()
 
@@ -42,3 +47,8 @@ class LocalStorage:
     def stamp_current_date(self):
         with open(self.DATE_FILE, 'w') as date_file:
             date_file.write(f"{datetime.now().strftime('%d-%b-%y')}")
+
+    def remove_csv_file(self):
+        csv_file_exits = os.path.exists(self.SERVER_DATA_FILE)
+        if csv_file_exits:
+            os.remove(self.SERVER_DATA_FILE)

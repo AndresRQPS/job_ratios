@@ -2,3 +2,5 @@
 *.json
 *.xlsx
 *.csv
+*.idea
+*__pycache__

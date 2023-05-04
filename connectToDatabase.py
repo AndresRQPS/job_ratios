@@ -1,4 +1,4 @@
-import cx_Oracle
+import oracledb
 from dotenv import dotenv_values
 
 config = dotenv_values('.env')
@@ -12,8 +12,9 @@ DPSSERVERNAME = config['DPSSERVERNAME']
 
 
 def connect_to_qps_database():
+    oracledb.init_oracle_client()
     try:
-        connection = cx_Oracle.connect(f'{USERNAME}/{PASSWORD}@//{IPADDRESS}:{PORT}/{QPSSERVERNAME}')
+        connection = oracledb.connect(f'{USERNAME}/{PASSWORD}@//{IPADDRESS}:{PORT}/{QPSSERVERNAME}')
         return connection
     except Exception as e:
         print('Connection to QPS database failed')
@@ -21,8 +22,9 @@ def connect_to_qps_database():
 
 
 def connect_to_dps_database():
+    oracledb.init_oracle_client()
     try:
-        connection = cx_Oracle.connect(f'{USERNAME}/{PASSWORD}@//{IPADDRESS}:{PORT}/{DPSSERVERNAME}')
+        connection = oracledb.connect(f'{USERNAME}/{PASSWORD}@//{IPADDRESS}:{PORT}/{DPSSERVERNAME}')
         return connection
     except Exception as e:
         print("Connection to DPS database failed")

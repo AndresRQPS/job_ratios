@@ -46,6 +46,9 @@ def add_apprentice_count():
             if 'APPRENTICE' not in day.keys():
                 day['APPRENTICE'] = 0
 
+            if 'JOURNEY' not in day.keys():
+                day['JOURNEY'] = 0
+
     with open('data.json', 'w') as data_file:
         data_file.write(json.dumps(job_data, indent=2))
 
@@ -95,7 +98,7 @@ def add_compliant():
         set_journey_count = job['set_journey_count']
         for day in job['days']:
             day_apprentice_count = day['APPRENTICE']
-            day_journey_count = day['JOURNEY']
+            day_journey_count = day.get('JOURNEY', 0)
             day['is_compliant'] = check_compliant(app_count=day_apprentice_count,
                                                   journey_count=day_journey_count,
                                                   set_app_count=set_app_count,
