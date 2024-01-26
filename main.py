@@ -6,6 +6,7 @@ from modify_json import format_json, add_apprentice_count, add_set_app_journey_c
 import schedule
 import time
 from datetime import datetime
+from stage_codes import stages_apprentice, stages_journeyman
 
 
 def run_job_ratio_script():
@@ -40,13 +41,10 @@ def run_job_ratio_script():
     # Remove duplicates by employee_code, job_id, and Log Date
     job_date_group_df = job_date_group_df.drop_duplicates(subset=['employee_code', 'job_id', 'Log Date'])
 
-    app_filt = (job_date_group_df['Union Code'].isin(['1ST-NEW', '2ND-NEW',
-                                                      '3RD', '4TH-NEW',
-                                                      '5TH-NEW', '6TH-NEW',
-                                                      '7TH-NEW', '8TH', '8TH-NEW']))
+    app_filt = (job_date_group_df['Union Code'].isin(stages_apprentice))
     job_date_group_df.loc[app_filt, 'Union Code'] = 'APPRENTICE'
 
-    journey_filt = job_date_group_df['Union Code'].isin(['FOREMEN'])
+    journey_filt = job_date_group_df['Union Code'].isin(stages_journeyman)
     job_date_group_df.loc[journey_filt, 'Union Code'] = 'JOURNEY'
 
     job_date_group_gp = job_date_group_df.groupby(['Job Name', 'Log Date'])
@@ -72,7 +70,10 @@ def run_job_ratio_script():
 
     send_email()
 
+    local_storage.delete_date_file()
 
+
+run_job_ratio_script()
 schedule.every().day.at('08:00').do(run_job_ratio_script)
 
 while True:

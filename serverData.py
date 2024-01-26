@@ -8,7 +8,7 @@ def days_till_tuesday():
     current_day = today.strftime('%A')
     days_until_tuesday = 0
 
-    while current_day != 'Tuesday':
+    while current_day != 'Monday':
         days_until_tuesday += 1
         current_day = (today - timedelta(days=days_until_tuesday)).strftime('%A')
 
@@ -18,6 +18,7 @@ def days_till_tuesday():
 class ServerData:
 
     num_days_back = days_till_tuesday()
+    # num_days_back = 7
     prev_date = datetime.now() - timedelta(days=num_days_back)
     prev_date_str = prev_date.strftime('%d-%b-%y')
 

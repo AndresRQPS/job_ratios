@@ -63,9 +63,10 @@ def send_email():
                      'cynthiad@qpscompany.com',
                      'andresr@qpscompany.com',
                      'mescobar@qpscompany.com',
-                     'shanam@qpscompany.com']
+                     'shanam@qpscompany.com', 'pately@qpscompany.com', 'oscara@qpscompany.com']
 
     # office_emails = ['andresr@qpscompany.com']
+    #                  'cynthiad@qpscompany.com']
 
     my_email = config["EMAILUSERNAME"]
     my_password = config["EMAILPASSWORD"]

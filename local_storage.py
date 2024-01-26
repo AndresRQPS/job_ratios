@@ -52,3 +52,14 @@ class LocalStorage:
         csv_file_exits = os.path.exists(self.SERVER_DATA_FILE)
         if csv_file_exits:
             os.remove(self.SERVER_DATA_FILE)
+
+    def delete_date_file(self):
+        file_name = self.DATE_FILE
+
+        # Check if the file exists
+        if os.path.exists(file_name):
+            # Delete the file
+            os.remove(file_name)
+            print(f"File '{file_name}' has been deleted.")
+        else:
+            print(f"File '{file_name}' does not exist.")
